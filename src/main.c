@@ -4,12 +4,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include "parse.h"
-#include "find.h" // Включаем заголовочный файл для команды find
+#include "find.h"
 
 #define MAX_INPUT_LENGTH 100
 
 void execute_command(ParsedInput *parsed_input) {
-    // Проверяем встроенные команды
     if (strcmp(parsed_input->command, "exit") == 0) {
         exit(0);
     } else if (strcmp(parsed_input->command, "cd") == 0) {
@@ -34,23 +33,20 @@ void execute_command(ParsedInput *parsed_input) {
         struct Options options = parseOptions(parsed_input->num_args, parsed_input->args);
         dirWalk(options.dir, &options);
     } else {
-        // Выполняем команду с помощью execvp
         pid_t pid = fork();
-        if (pid == 0) { // Это дочерний процесс
-            char *args[MAX_ARGS + 2]; // +2 для имени команды и NULL в конце
+        if (pid == 0) { 
+            char *args[MAX_ARGS + 2]; 
             args[0] = parsed_input->command;
             for (int i = 0; i < parsed_input->num_args; ++i) {
                 args[i+1] = parsed_input->args[i];
             }
             args[parsed_input->num_args + 1] = NULL;
             execvp(parsed_input->command, args);
-            // Если execvp() вернул ошибку, печатаем сообщение об ошибке
-            perror("Ошибка execvp");
             exit(1);
-        } else if (pid < 0) { // Ошибка при создании дочернего процесса
+        } else if (pid < 0) { 
             perror("Ошибка fork");
-        } else { // Это родительский процесс
-            wait(NULL); // Ждем завершения дочернего процесса
+        } else { 
+            wait(NULL); 
         }
     }
 }
@@ -61,7 +57,7 @@ int main() {
     while (1) {
         printf("myshell> ");
         fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = '\0'; // Удаляем символ новой строки из ввода
+        input[strcspn(input, "\n")] = '\0';
 
         ParsedInput parsed_input = parse_input(input);
         execute_command(&parsed_input);
