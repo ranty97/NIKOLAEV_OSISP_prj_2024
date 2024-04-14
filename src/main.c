@@ -54,9 +54,16 @@ void execute_command(ParsedInput *parsed_input) {
 
 int main() {
     char input[MAX_INPUT_LENGTH];
+    char cwd[1024];
 
     while (1) {
-        printf("myshell> ");
+        printf("\033[32minshell:\033[0m");
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            printf("%s \033[32m$\033[0m ", cwd);
+        } else {
+            perror("getcwd() error");
+            return 1;
+        }
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
 
