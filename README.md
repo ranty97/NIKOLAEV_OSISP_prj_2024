@@ -3,10 +3,10 @@
 ## Done ##
 1. parser
 2. find util
-3. cd util
+3. cd, pwd util
+4. pwd in line
 
 ## Plan ##
-* min "ui"
 * min work with files
 * cat(head/tail) utils
 * env variables
