@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include "parse.h"
 #include "find.h"
+#include "cd.h"
 
 #define MAX_INPUT_LENGTH 100
 
@@ -13,7 +14,7 @@ void execute_command(ParsedInput *parsed_input) {
         exit(0);
     } else if (strcmp(parsed_input->command, "cd") == 0) {
         if (parsed_input->num_args == 1) {
-            chdir(parsed_input->args[0]);
+            exec_cd(parsed_input->args[0]);
         } else {
             fprintf(stderr, "Используйте: cd <путь>\n");
         }
