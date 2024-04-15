@@ -7,6 +7,7 @@
 #include "find.h"
 #include "cd.h"
 #include "cat_related.h"
+#include "rm.h"
 
 #define MAX_INPUT_LENGTH 100
 
@@ -40,6 +41,8 @@ void execute_command(ParsedInput *parsed_input) {
         headm(parsed_input->num_args, parsed_input->args);
     } else if (strcmp(parsed_input->command, "tail") == 0) {
         tailm(parsed_input->num_args, parsed_input->args);
+    } else if (strcmp(parsed_input->command, "rm") == 0) {
+        remutil(parsed_input->num_args, parsed_input->args);
     } else {
         pid_t pid = fork();
         if (pid == 0) { 
