@@ -6,6 +6,7 @@
 #include "parse.h"
 #include "find.h"
 #include "cd.h"
+#include "cat_related.h"
 
 #define MAX_INPUT_LENGTH 100
 
@@ -33,6 +34,12 @@ void execute_command(ParsedInput *parsed_input) {
     } else if (strcmp(parsed_input->command, "find") == 0) {
         struct Options options = parseOptions(parsed_input->num_args, parsed_input->args);
         dirWalk(options.dir, &options);
+    } else if (strcmp(parsed_input->command, "cat") == 0) {
+        catm(parsed_input->num_args, parsed_input->args);
+    } else if (strcmp(parsed_input->command, "head") == 0) {
+        headm(parsed_input->num_args, parsed_input->args);
+    } else if (strcmp(parsed_input->command, "tail") == 0) {
+        tailm(parsed_input->num_args, parsed_input->args);
     } else {
         pid_t pid = fork();
         if (pid == 0) { 
@@ -57,9 +64,9 @@ int main() {
     char cwd[1024];
 
     while (1) {
-        printf("\033[32minshell:\033[0m");
+        printf("\033[32minshell: \033[0m");
         if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            printf("%s \033[32m$\033[0m ", cwd);
+            printf("%s ", cwd);
         } else {
             perror("getcwd() error");
             return 1;

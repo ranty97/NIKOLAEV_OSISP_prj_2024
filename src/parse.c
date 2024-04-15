@@ -18,12 +18,8 @@ ParsedInput parse_input(char *input) {
                 fprintf(stderr, "Превышено максимальное количество аргументов\n");
                 break;
             }
-            if(token[0] == '-'){
-                printf("nice");
-            }
             parsed.args[parsed.num_args] = my_strdup(token);
             parsed.num_args++;
-            printf("Аргумент %d: %s\n", parsed.num_args, parsed.args[parsed.num_args - 1]);
             token = strtok(NULL, " \t\n");
         }
     }
