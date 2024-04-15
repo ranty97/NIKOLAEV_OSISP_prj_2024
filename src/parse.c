@@ -16,8 +16,10 @@ ParsedInput parse_input(char *input) {
         while (token != NULL) {
             if (parsed.num_args >= MAX_ARGS - 1) {
                 fprintf(stderr, "Превышено максимальное количество аргументов\n");
-            //printf("Аргумент %d: %s\n", parsed.num_args, parsed.args[parsed.num_args - 1]);    break;
+                break;
             }
+
+            //printf("Аргумент %d: %s\n", parsed.num_args, parsed.args[parsed.num_args - 1]);
             parsed.args[parsed.num_args] = my_strdup(token);
             parsed.num_args++;
             token = strtok(NULL, " \t\n");
