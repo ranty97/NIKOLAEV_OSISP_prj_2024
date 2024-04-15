@@ -8,6 +8,7 @@
 #include "cd.h"
 #include "cat_related.h"
 #include "rm.h"
+#include "mk.h"
 
 #define MAX_INPUT_LENGTH 100
 
@@ -43,6 +44,8 @@ void execute_command(ParsedInput *parsed_input) {
         tailm(parsed_input->num_args, parsed_input->args);
     } else if (strcmp(parsed_input->command, "rm") == 0) {
         remutil(parsed_input->num_args, parsed_input->args);
+    } else if (strcmp(parsed_input->command, "touch") == 0) {
+        touch(parsed_input->num_args, parsed_input->args);
     } else {
         pid_t pid = fork();
         if (pid == 0) { 
