@@ -71,14 +71,10 @@ void remutil(int argc, char* argv[]) {
     for (int i = 0; i < argc; i++) {
         const char* path = argv[i];
         struct stat path_info;
-        printf("tutuk");
         if (lstat(path, &path_info) == 0) {
-            printf("tut");
             if (S_ISDIR(path_info.st_mode) && recursive) {
-                printf("chego");
                 remove_directory(path);
             } else {
-                printf("dfnjsdhfiusdhfiushfiuh");
                 remove_file(path);
             }
         }
