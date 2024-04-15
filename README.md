@@ -18,5 +18,5 @@ $ make all
 
 ## Run ## 
 ```shell
-./shell
+./build/main
 ```
