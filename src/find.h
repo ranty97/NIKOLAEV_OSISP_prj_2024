@@ -24,4 +24,6 @@ struct Options parseOptions(int argc, char** argv);
 
 void dirWalk(char *path, struct Options *options);
 
+void find_m(int argc, char** argv);
+
 #endif /* FIND_H */

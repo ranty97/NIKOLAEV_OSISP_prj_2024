@@ -8,6 +8,6 @@
 #include <sys/wait.h>
 #include <errno.h>
 
-int exec_cd(char *arg);
+void exec_cd(char *arg);
 
 #endif

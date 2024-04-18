@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void touch(int argc, char** argv);
+void touch_m(int argc, char** argv);
 
 void make_dir(int argc, char** argv);
 

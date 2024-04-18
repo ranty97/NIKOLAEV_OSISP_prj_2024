@@ -3,7 +3,7 @@
 
 char lastdir[256];
 
-int exec_cd(char *arg) {
+void exec_cd(char *arg) {
     char curdir[256];
     char path[256];
 
@@ -16,7 +16,7 @@ int exec_cd(char *arg) {
     if (!strcmp(arg, "-")) {
         if (*lastdir == '\0') {
             fprintf(stderr, "no previous directory\n");
-            return 1;
+            return;
         }
         arg = lastdir;
     } else {
@@ -26,14 +26,14 @@ int exec_cd(char *arg) {
                 arg = path;
             } else {
                 fprintf(stderr, "syntax not supported: %s\n", arg);
-                return 1;
+                return;
             }
         }
     }
     if (chdir(arg)) {
         fprintf(stderr, "chdir: %s: %s\n", strerror(errno), path);
-        return 1;
+        return;
     }
     strcpy(lastdir, curdir);
-    return 0;
+    return;
 }

@@ -1,6 +1,6 @@
 #include "mk.h"
 
-void touch(int argc, char** argv) {
+void touch_m(int argc, char** argv) {
     if (argc < 1) {
         printf("Использование: touch <файл1> [<файл2> ...]\n");
         return;

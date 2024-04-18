@@ -83,3 +83,8 @@ void dirWalk(char *path, struct Options *options) {
     }
     free(dinfo);
 }
+
+void find_m(int argc, char** argv) {
+    struct Options options = parseOptions(argc, argv);
+    dirWalk(options.dir, &options);
+}

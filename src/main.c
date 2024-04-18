@@ -9,59 +9,67 @@
 #include "cat_related.h"
 #include "rm.h"
 #include "mk.h"
+#include "common.h"
 
 #define MAX_INPUT_LENGTH 100
 
-void execute_command(ParsedInput *parsed_input) {
-    if (strcmp(parsed_input->command, "exit") == 0) {
-        exit(0);
-    } else if (strcmp(parsed_input->command, "cd") == 0) {
-        if (parsed_input->num_args == 1) {
-            exec_cd(parsed_input->args[0]);
-        } else {
-            fprintf(stderr, "Используйте: cd <путь>\n");
+char *builtin_str[] = {
+  "exit",
+  "cd",
+  "pwd",
+  "echo",
+  "find",
+  "cat",
+  "head",
+  "tail",
+  "rm",
+  "touch",
+  "mkdir",
+  "cls"
+};
+
+void (*builtin_funcs[]) (int argc, char** argv) = {
+    &exit_m,
+    &cd_m,
+    &pwd_m,
+    &echo_m,
+    &find_m,
+    &catm,
+    &headm,
+    &tailm,
+    &remutil,
+    &touch_m,
+    &make_dir,
+    &cls
+};
+
+int count_builtins() {
+  return sizeof(builtin_str) / sizeof(char *);
+}
+
+void execute_m(char* command, int argc, char** argv) {
+    int commandIndex = -1;
+
+    for (int i = 0; i < count_builtins(); i++) {
+        if(strcmp(builtin_str[i], command) == 0) {
+            commandIndex = i;
+            break;
         }
-    } else if (strcmp(parsed_input->command, "pwd") == 0) {
-        char cwd[1024];
-        if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            printf("%s\n", cwd);
-        } else {
-            perror("Ошибка getcwd");
-        }
-    } else if (strcmp(parsed_input->command, "echo") == 0) {
-        for (int i = 0; i < parsed_input->num_args; ++i) {
-            printf("%s ", parsed_input->args[i]);
-        }
-        printf("\n");
-    } else if (strcmp(parsed_input->command, "find") == 0) {
-        struct Options options = parseOptions(parsed_input->num_args, parsed_input->args);
-        dirWalk(options.dir, &options);
-    } else if (strcmp(parsed_input->command, "cat") == 0) {
-        catm(parsed_input->num_args, parsed_input->args);
-    } else if (strcmp(parsed_input->command, "head") == 0) {
-        headm(parsed_input->num_args, parsed_input->args);
-    } else if (strcmp(parsed_input->command, "tail") == 0) {
-        tailm(parsed_input->num_args, parsed_input->args);
-    } else if (strcmp(parsed_input->command, "rm") == 0) {
-        remutil(parsed_input->num_args, parsed_input->args);
-    } else if (strcmp(parsed_input->command, "touch") == 0) {
-        touch(parsed_input->num_args, parsed_input->args);
+    }
+
+    if(commandIndex == -1) {
+        printf("command not found\n");
+    }
+    
+    pid_t pid = fork();
+
+    if(pid == 0) {
+        (*builtin_funcs[commandIndex])(argc, argv);
+    } else if (pid > 0) {
+        wait(NULL);
+        printf("Выполнение команды завершено.\n");
     } else {
-        pid_t pid = fork();
-        if (pid == 0) { 
-            char *args[MAX_ARGS + 2]; 
-            args[0] = parsed_input->command;
-            for (int i = 0; i < parsed_input->num_args; ++i) {
-                args[i+1] = parsed_input->args[i];
-            }
-            args[parsed_input->num_args + 1] = NULL;
-            execvp(parsed_input->command, args);
-            exit(1);
-        } else if (pid < 0) { 
-            perror("Ошибка fork");
-        } else { 
-            wait(NULL); 
-        }
+        printf("Ошибка при создании дочернего процесса.\n");
     }
 }
 
@@ -81,9 +89,10 @@ int main() {
         input[strcspn(input, "\n")] = '\0';
 
         ParsedInput parsed_input = parse_input(input);
-        execute_command(&parsed_input);
+        execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
         free_parsed_input(&parsed_input);
     }
 
     return 0;
 }
+   
