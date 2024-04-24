@@ -7,10 +7,12 @@
 4. pwd in line
 5. remove util for files and dirs
 6. cat and head/tail utils
+7. min work with files
+8. env vars
 
 ## Plan ##
-* min work with files(70% done)
-* env variables
+* history
+* chmod -x
 
 ## Build ##
 ```shell
