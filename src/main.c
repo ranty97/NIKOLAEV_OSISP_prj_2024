@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 #include "parse.h"
 #include "find.h"
 #include "cd.h"
@@ -10,8 +11,11 @@
 #include "rm.h"
 #include "mk.h"
 #include "common.h"
+#include "env.h"
 
 #define MAX_INPUT_LENGTH 100
+
+const char* env_filename = "/home/ivan/OSISP/Shell/enviroment.txt";
 
 char *builtin_str[] = {
   "exit",
@@ -25,7 +29,7 @@ char *builtin_str[] = {
   "rm",
   "touch",
   "mkdir",
-  "cls"
+  "clear"
 };
 
 void (*builtin_funcs[]) (int argc, char** argv) = {
@@ -43,12 +47,26 @@ void (*builtin_funcs[]) (int argc, char** argv) = {
     &cls
 };
 
+bool hasEqualSign(const char* str) {
+    while (*str != '\0') {
+        if (*str == '=') {
+            return true;
+        }
+        str++;
+    }
+    return false;
+}
+
 int count_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
 }
 
 void execute_m(char* command, int argc, char** argv) {
     int commandIndex = -1;
+
+    if(strcmp(command, "exit") == 0) {
+        exit(0);
+    }
 
     for (int i = 0; i < count_builtins(); i++) {
         if(strcmp(builtin_str[i], command) == 0) {
@@ -67,9 +85,9 @@ void execute_m(char* command, int argc, char** argv) {
         (*builtin_funcs[commandIndex])(argc, argv);
     } else if (pid > 0) {
         wait(NULL);
-        printf("Выполнение команды завершено.\n");
+        printf("complite.\n");
     } else {
-        printf("Ошибка при создании дочернего процесса.\n");
+        printf("err.\n");
     }
 }
 
@@ -89,7 +107,12 @@ int main() {
         input[strcspn(input, "\n")] = '\0';
 
         ParsedInput parsed_input = parse_input(input);
-        execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
+
+        if(hasEqualSign(parsed_input.command)){
+            saveVariableToFile(parsed_input.command);
+        } else {
+            execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
+        }
         free_parsed_input(&parsed_input);
     }
 

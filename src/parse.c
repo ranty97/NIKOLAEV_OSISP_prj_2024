@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include "env.h"
+
+//const char* env_filename = "/home/ivan/OSISP/Shell/enviroment.txt";
 
 ParsedInput parse_input(char *input) {
     ParsedInput parsed;
@@ -18,9 +22,13 @@ ParsedInput parse_input(char *input) {
                 fprintf(stderr, "Превышено максимальное количество аргументов\n");
                 break;
             }
-
-            //printf("Аргумент %d: %s\n", parsed.num_args, parsed.args[parsed.num_args - 1]);
-            parsed.args[parsed.num_args] = my_strdup(token);
+            if(startWithDollar(my_strdup(token))) {
+                char* env_var = removeDollar(my_strdup(token));
+                parsed.args[parsed.num_args] = getVariableFromFile(env_var);
+                free(env_var);
+            }else {
+                parsed.args[parsed.num_args] = my_strdup(token);
+            }
             parsed.num_args++;
             token = strtok(NULL, " \t\n");
         }
@@ -43,4 +51,13 @@ char *my_strdup(const char *s) {
         memcpy(copy, s, len);
     }
     return copy;
+}
+
+bool startWithDollar(char* str) {
+    return (str[0] == '$');
+}
+
+char* removeDollar(const char* str) {
+    char* newStr = my_strdup(str + 1);
+    return newStr;
 }

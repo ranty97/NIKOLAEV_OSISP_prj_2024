@@ -4,7 +4,7 @@ rwildcard = $(filter-out \ ,$(foreach pattern,$(2),$(wildcard $(1)/$(pattern)))$
 eq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 
 BUILD_DIR = build
-EXECUTABLE = $(BUILD_DIR)/main$(if $(call eq,$(MODE),debug),-debug)
+EXECUTABLE = $(BUILD_DIR)/inshell$(if $(call eq,$(MODE),debug),-debug)
 WF ?= 
 WD ?= .
 

@@ -1,44 +1,60 @@
 #include "env.h"
 
-int environmentSize = 0;
-
-void setVariable(const char* name, const char* value) {
-    if (environmentSize >= MAX_VARIABLES) {
-        printf("Ошибка: достигнуто максимальное количество переменных окружения\n");
+void saveVariableToFile(char* variableString) {
+    FILE* file = fopen(env_filename, "a");
+    if (file == NULL) {
+        printf("Ошибка при открытии файла для записи\n");
         return;
     }
 
-    strncpy(environment[environmentSize].name, name, MAX_NAME - 1);
-    strncpy(environment[environmentSize].value, value, MAX_VALUE - 1);
-    environment[environmentSize].name[MAX_NAME - 1] = '\0';
-    environment[environmentSize].value[MAX_VALUE - 1] = '\0';
+    char* equalsSign = strchr(variableString, '=');
+    if (equalsSign != NULL) {
+        *equalsSign = '\0';
+        char* name = variableString;
+        char* value = equalsSign + 1;
 
-    environmentSize++;
+        fprintf(file, "%s=%s\n", name, value);
+
+        fclose(file);
+        printf("Переменная успешно сохранена в файле\n");
+    } else {
+        printf("Ошибка: некорректный формат переменной\n");
+        fclose(file);
+    }
 }
 
-void getVariable(const char* name) {
-    for (int i = 0; i < environmentSize; i++) {
-        if (strcmp(environment[i].name, name) == 0) {
-            printf("%s=%s\n", environment[i].name, environment[i].value);
-            return;
-        }
+char* getVariableFromFile(const char* variableName) {
+    FILE* file = fopen(env_filename, "r");
+    if (file == NULL) {
+        printf("Ошибка при открытии файла для чтения\n");
+        return NULL;
     }
 
-    printf("Переменная окружения не найдена\n");
-}
+    char line[100];
 
-void unsetVariable(const char* name) {
-    for (int i = 0; i < environmentSize; i++) {
-        if (strcmp(environment[i].name, name) == 0) {
-            for (int j = i; j < environmentSize - 1; j++) {
-                strcpy(environment[j].name, environment[j + 1].name);
-                strcpy(environment[j].value, environment[j + 1].value);
+    while (fgets(line, sizeof(line), file) != NULL) {
+        // Удаление символа новой строки, если он присутствует
+        size_t len = strlen(line);
+        if (len > 0 && line[len - 1] == '\n') {
+            line[len - 1] = '\0';
+        }
+
+        char* equalsSign = strchr(line, '=');
+        if (equalsSign != NULL) {
+            *equalsSign = '\0';
+            char* name = line;
+            char* value = equalsSign + 1;
+
+            if (strcmp(name, variableName) == 0) {
+                fclose(file);
+                char* variableValue = (char*)malloc(strlen(value) + 1);
+                strcpy(variableValue, value);
+                return variableValue;
             }
-            environmentSize--;
-            printf("Переменная окружения успешно удалена\n");
-            return;
         }
     }
 
-    printf("Переменная окружения не найдена\n");
+    printf("Переменная не найдена в файле\n");
+    fclose(file);
+    return NULL;
 }
