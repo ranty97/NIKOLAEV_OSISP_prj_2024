@@ -9,17 +9,23 @@
 6. cat and head/tail utils
 7. min work with files
 8. env vars
+9. ls util
+10. opp to exe
 
 ## Plan ##
 * history
-* chmod -x
+* chmod -x(80% done)
 
 ## Build ##
 ```shell
 $ make all
 ```
+## clean ##
+```shell
+$ make clean
+```
 
 ## Run ## 
 ```shell
-./build/main
+./build/inshell
 ```
