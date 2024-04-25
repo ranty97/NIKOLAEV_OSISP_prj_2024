@@ -65,13 +65,14 @@ DIR *dir;
         }
 
         if (S_ISDIR(file_info.st_mode)) {
-            printf("%s%s%s\n", GREEN, entry->d_name, RESET);
+            printf("%s%s%s ", GREEN, entry->d_name, RESET);
         } else if (S_ISREG(file_info.st_mode) && (file_info.st_mode & S_IXUSR)) {
-            printf("%s%s%s\n", RED, entry->d_name, RESET); 
+            printf("%s%s%s ", RED, entry->d_name, RESET); 
         } else {
-            printf("%s\n", entry->d_name); 
+            printf("%s ", entry->d_name); 
         }
     }
+    printf("\n");
 
     closedir(dir);
 }

@@ -8,9 +8,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 int isExecutable(char* path);
 void execute_file(char* path, char** argv);
 void my_execvp(const char* path, char** argv);
+void chmod_m(int argc, char** argv);
 
 #endif

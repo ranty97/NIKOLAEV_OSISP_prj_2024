@@ -30,7 +30,8 @@ char *builtin_str[] = {
   "touch",
   "mkdir",
   "clear", 
-  "ls"
+  "ls",
+  "chmod"
 };
 
 void (*builtin_funcs[]) (int argc, char** argv) = {
@@ -45,7 +46,8 @@ void (*builtin_funcs[]) (int argc, char** argv) = {
     &touch_m,
     &make_dir,
     &cls,
-    &ls
+    &ls,
+    &chmod_m
 };
 
 bool hasEqualSign(const char* str) {
@@ -99,9 +101,12 @@ int main() {
             perror("getcwd() error");
             return 1;
         }
+        
         fgets(input, sizeof(input), stdin);
+        if (input[0] == '\n') {
+            continue;  // Пропускаем пустой ввод
+        }
         input[strcspn(input, "\n")] = '\0';
-
         ParsedInput parsed_input = parse_input(input);
 
         if(hasEqualSign(parsed_input.command)){
