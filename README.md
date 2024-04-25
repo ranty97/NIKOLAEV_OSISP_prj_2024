@@ -15,14 +15,15 @@
 ## Plan ##
 * history
 * chmod -x(80% done)
+* piping
 
 ## Build ##
 ```shell
-$ make all
+make all
 ```
-## clean ##
+## Clean ##
 ```shell
-$ make clean
+make clean
 ```
 
 ## Run ## 
