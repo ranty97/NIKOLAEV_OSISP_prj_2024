@@ -12,13 +12,13 @@
 #include "mk.h"
 #include "common.h"
 #include "env.h"
+#include "chmod_related.h"
 
 #define MAX_INPUT_LENGTH 100
 
 const char* env_filename = "/home/ivan/OSISP/Shell/enviroment.txt";
 
 char *builtin_str[] = {
-  "exit",
   "cd",
   "pwd",
   "echo",
@@ -29,11 +29,11 @@ char *builtin_str[] = {
   "rm",
   "touch",
   "mkdir",
-  "clear"
+  "clear", 
+  "ls"
 };
 
 void (*builtin_funcs[]) (int argc, char** argv) = {
-    &exit_m,
     &cd_m,
     &pwd_m,
     &echo_m,
@@ -44,7 +44,8 @@ void (*builtin_funcs[]) (int argc, char** argv) = {
     &remutil,
     &touch_m,
     &make_dir,
-    &cls
+    &cls,
+    &ls
 };
 
 bool hasEqualSign(const char* str) {
@@ -75,19 +76,14 @@ void execute_m(char* command, int argc, char** argv) {
         }
     }
 
-    if(commandIndex == -1) {
+    if (isExecutable(command)) {
+        execute_file(command, argv);
+    } else if (commandIndex == -1) {
         printf("command not found\n");
-    }
-    
-    pid_t pid = fork();
-
-    if(pid == 0) {
-        (*builtin_funcs[commandIndex])(argc, argv);
-    } else if (pid > 0) {
-        wait(NULL);
-        printf("complite.\n");
+        return;
     } else {
-        printf("err.\n");
+        (*builtin_funcs[commandIndex])(argc, argv);
+        return;
     }
 }
 

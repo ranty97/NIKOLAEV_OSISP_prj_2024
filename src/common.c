@@ -37,3 +37,41 @@ void cls(int argc, char** argv) {
     (void)argv;
     printf("\033[2J\033[H");
 }
+
+void ls(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
+
+DIR *dir;
+    struct dirent *entry;
+    struct stat file_info;
+
+    dir = opendir(".");
+    if (dir == NULL) {
+        perror("opendir error");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue; 
+        }
+
+        char *path = entry->d_name;
+
+        if (lstat(path, &file_info) == -1) {
+            perror("lstat error");
+            continue;
+        }
+
+        if (S_ISDIR(file_info.st_mode)) {
+            printf("%s%s%s\n", GREEN, entry->d_name, RESET);
+        } else if (S_ISREG(file_info.st_mode) && (file_info.st_mode & S_IXUSR)) {
+            printf("%s%s%s\n", RED, entry->d_name, RESET); 
+        } else {
+            printf("%s\n", entry->d_name); 
+        }
+    }
+
+    closedir(dir);
+}

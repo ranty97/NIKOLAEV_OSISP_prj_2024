@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "env.h"
 
 //const char* env_filename = "/home/ivan/OSISP/Shell/enviroment.txt";
@@ -16,6 +17,9 @@ ParsedInput parse_input(char *input) {
 
     if (token != NULL) {
         parsed.command = my_strdup(token);
+        if(startWithDollar(parsed.command)) {
+            parsed.command = getVariableFromFile(removeDollar(parsed.command));
+        }
         token = strtok(NULL, " \t\n");
         while (token != NULL) {
             if (parsed.num_args >= MAX_ARGS - 1) {
@@ -28,6 +32,7 @@ ParsedInput parse_input(char *input) {
                 free(env_var);
             }else {
                 parsed.args[parsed.num_args] = my_strdup(token);
+                //printf("%s",parsed.args[parsed.num_args]);
             }
             parsed.num_args++;
             token = strtok(NULL, " \t\n");
