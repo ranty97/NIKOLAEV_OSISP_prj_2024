@@ -11,10 +11,10 @@
 8. env vars
 9. ls util
 10. opp to exe
+11. chmod [*x] util
 
 ## Plan ##
 * history
-* chmod -x(80% done)
 * piping
 
 ## Build ##
