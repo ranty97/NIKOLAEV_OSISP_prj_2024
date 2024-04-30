@@ -15,7 +15,10 @@
 12. history 
 
 ## Plan ##
-* piping(33%)
+* piping(30%)
+	* split commads(90%)
+	* piping func 
+	* piping commands 
 
 ## Build ##
 ```shell
