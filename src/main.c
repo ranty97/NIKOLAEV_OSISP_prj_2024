@@ -13,8 +13,14 @@
 #include "common.h"
 #include "env.h"
 #include "chmod_related.h"
+#include "history.h"
 
 #define MAX_INPUT_LENGTH 100
+#define HISTORY_SIZE 100
+#define BUFFER_SIZE 1024
+
+char* history[HISTORY_SIZE];  // Глобальный массив для хранения истории команд
+int history_count;
 
 const char* env_filename = "/home/ivan/OSISP/Shell/enviroment.txt";
 
@@ -31,7 +37,8 @@ char *builtin_str[] = {
   "mkdir",
   "clear", 
   "ls",
-  "chmod"
+  "chmod",
+  "history"
 };
 
 void (*builtin_funcs[]) (int argc, char** argv) = {
@@ -47,7 +54,8 @@ void (*builtin_funcs[]) (int argc, char** argv) = {
     &make_dir,
     &cls,
     &ls,
-    &chmod_m
+    &chmod_m,
+    &print_history
 };
 
 bool hasEqualSign(const char* str) {
@@ -90,8 +98,10 @@ void execute_m(char* command, int argc, char** argv) {
 }
 
 int main() {
+    history_count = 0;
     char input[MAX_INPUT_LENGTH];
     char cwd[1024];
+    int num_commands = 0;
 
     while (1) {
         printf("\033[32minshell: \033[0m");
@@ -104,10 +114,33 @@ int main() {
         
         fgets(input, sizeof(input), stdin);
         if (input[0] == '\n') {
-            continue;  // Пропускаем пустой ввод
+            continue;
         }
         input[strcspn(input, "\n")] = '\0';
+
+        ParsedInput* commands = split_commands(input, &num_commands);
+
+        for (int i = 0; i < num_commands; i++) {
+        printf("Command %d: %s\n", i, commands[i].command);
+        printf("Num Args: %d\n", commands[i].num_args);
+        for (int j = 0; j < commands[i].num_args; j++) {
+            printf("Arg %d: %s\n", j, commands[i].args[j]);
+        }
+        printf("\n");
+    }
+
+    // Освобождение памяти
+    for (int i = 0; i < num_commands; i++) {
+        free(commands[i].command);
+        for (int j = 0; j < commands[i].num_args; j++) {
+            free(commands[i].args[j]);
+        }
+    }
+    free(commands);
+
         ParsedInput parsed_input = parse_input(input);
+
+        add_to_history(parsed_input.command, parsed_input.num_args, parsed_input.args);
 
         if(hasEqualSign(parsed_input.command)){
             saveVariableToFile(parsed_input.command);

@@ -3,6 +3,12 @@
 
 #include <stdbool.h>
 
+#ifdef __STDC_ALLOC_LIB__
+#define __STDC_WANT_LIB_EXT2__ 1
+#else
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #define MAX_ARGS 10  
 #define MAX_CMD_LENGTH 100
 
@@ -17,5 +23,6 @@ void free_parsed_input(ParsedInput *parsed);
 char *my_strdup(const char *s);
 bool startWithDollar(char* str);
 char* removeDollar(const char* str);
+ParsedInput* split_commands(char* input, int* num_commands);
 
 #endif /* PARSE_H */
