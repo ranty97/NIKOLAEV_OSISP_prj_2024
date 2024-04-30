@@ -12,10 +12,10 @@
 9. ls util
 10. opp to exe
 11. chmod [*x] util
+12. history 
 
 ## Plan ##
-* history
-* piping
+* piping(33%)
 
 ## Build ##
 ```shell
