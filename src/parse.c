@@ -137,3 +137,37 @@ ParsedInput* split_commands(char* input, int* num_commands) {
 
     return commands;
 }
+
+ParsedPipeline parse_pipeline(char *input) {
+    ParsedPipeline pipeline;
+    pipeline.num_commands = 0;
+
+    // Копируем input, чтобы strtok не изменял оригинал
+    char *input_copy = my_strdup(input);
+
+    char *saveptr;
+    char *command_str = strtok_r(input_copy, "|", &saveptr);
+    while (command_str != NULL) {
+        if (pipeline.num_commands >= MAX_COMMANDS) {
+            fprintf(stderr, "Превышено максимальное количество команд\n");
+            break;
+        }
+
+        // Создаем копию команды для парсинга
+        char *command_copy = my_strdup(command_str);
+        ParsedInput parsed_command = parse_input(command_copy);
+        pipeline.commands[pipeline.num_commands] = parsed_command;
+        pipeline.num_commands++;
+
+        free(command_copy);
+
+        command_str = strtok_r(NULL, "|", &saveptr);
+    }
+
+    free(input_copy);
+    return pipeline;
+}
+
+int contains_pipe(const char *input) {
+    return strchr(input, '|') != NULL;
+}
