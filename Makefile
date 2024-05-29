@@ -9,6 +9,7 @@ WF ?=
 WD ?= .
 
 CFLAGS = -W -Wall -Wextra -Werror -pedantic -std=c11 $(if $(call eq,$(MODE),debug),-ggdb)
+LDFLAGS = -lncurses
 CC = gcc $(CFLAGS)
 SOURCES = $(call rwildcard,src,*.c)
 
@@ -22,7 +23,7 @@ run: $(EXECUTABLE)
 app: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES) $(BUILD_DIR)
-	$(CC) $(SOURCES) -o $(EXECUTABLE)
+	$(CC) $(SOURCES) -o $(EXECUTABLE) $(LDFLAGS)
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
