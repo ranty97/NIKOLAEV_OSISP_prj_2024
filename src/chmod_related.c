@@ -12,13 +12,10 @@ void execute_file(char* path, char** argv) {
 
     pid = fork();
     if (pid == 0) {
-        // Child process
         my_execvp(path, argv);
     } else if (pid < 0) {
-        // Error forking
         perror("lsh");
     } else {
-        // Parent process
         do {
             waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
@@ -40,39 +37,40 @@ void my_execvp(const char* path, char** argv) {
 }
 
 void chmod_m(int argc,  char** argv) {
-    if (argc < 2) {
-        printf("usage: chmod [+/-x] PATH");
+    if (argc < 2) { 
+        printf("usage: chmod [+/-x] PATH\n");
         return;
-    } else if ((argv[0][0] != '-' || argv[0][0] != '+') && argv[0][1] != 'x') {
-        printf("usage: chmod [+/-x] PATH"); 
+    } 
+
+    if ((argv[0][0] != '-' && argv[0][0] != '+') || argv[0][1] != 'x' || argv[0][2] != '\0') {
+        printf("usage: chmod [+/-x] PATH\n");
         return;
-    } else if (argv[1] == NULL) {
-        printf("usage: chmod [+/-x] PATH"); 
+    } 
+
+    if (argv[1] == NULL) {
+        printf("usage: chmod [+/-x] PATH\n");
         return;
     }
 
     struct stat fileStat;
+    if (stat(argv[1], &fileStat) != 0) {
+        perror("error to get info");
+        return;
+    }
 
-    printf("%s", argv[1]);
-
-    stat(argv[1], &fileStat);
-    perror("error to get info");
-
+    mode_t new_mode;
     if (argv[0][0] == '-') {
-        if (!isExecutable(argv[1])) {
-            printf("nothing was done");
-        } else {
-            fileStat.st_mode &= ~(S_IXUSR | S_IXGRP | S_IXOTH);
-            chmod(argv[1], fileStat.st_mode);
-            perror("error with permition");
-        }
-    } else if (argv[0][0] == 'x') {
-        if (isExecutable(argv[1])) {
-            printf("nothing done");
-        } else {
-            fileStat.st_mode |= (S_IXUSR | S_IXGRP | S_IXOTH);
-            chmod(argv[1], fileStat.st_mode);
-            perror("error with permition");
-        }
+        new_mode = fileStat.st_mode & ~(S_IXUSR | S_IXGRP | S_IXOTH);
+    } else if (argv[0][0] == '+') {
+        new_mode = fileStat.st_mode | (S_IXUSR | S_IXGRP | S_IXOTH);
+    } else {
+        printf("usage: chmod [+/-x] PATH\n");
+        return;
+    }
+
+    if (chmod(argv[1], new_mode) != 0) {
+        perror("error with permission");
+    } else {
+        printf("Permissions changed successfully\n");
     }
 }

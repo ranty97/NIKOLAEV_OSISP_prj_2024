@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdbool.h>
+#include "text.h"
 #include "parse.h"
 #include "find.h"
 #include "cd.h"
@@ -266,75 +267,41 @@ void lee(char *command, int argc, char **argv, const char *output_file) {
 }
 
 int main() {
-    history_count = 0;
-    //char input[MAX_INPUT_LENGTH];
     char* input;
-    char cwd[1024];
-    //int num_commands = 2;
 
     while (1) {
-        printf("\033[32minshell: \033[0m");
-        if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            printf("%s ", cwd);
-        } else {
-            perror("getcwd() error");
-            return 1;
-        }
-        
-        //fgets(input, sizeof(input), stdin);
-        input = my_readline("");
-        if (input[0] == '\n') {
+        input = get_input();
+        if (input == NULL) {
             continue;
         }
-        input[strcspn(input, "\n")] = '\0';
 
         switch (contains_pipe(input)) {
-    case 0: {
-        ParsedInput parsed_input = parse_input(input);
-        
-        add_to_history(parsed_input.command, parsed_input.num_args, parsed_input.args);
+            case 0: {
+                ParsedInput parsed_input = parse_input(input);
 
-        if (hasEqualSign(parsed_input.command)) {
-            saveVariableToFile(parsed_input.command);
-        } else {
-            execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
+                add_to_history(parsed_input.command, parsed_input.num_args, parsed_input.args);
+
+                if (hasEqualSign(parsed_input.command)) {
+                    saveVariableToFile(parsed_input.command);
+                } else {
+                    execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
+                }
+                free_parsed_input(&parsed_input);
+                break;
+            }
+            case 1: {
+                ParsedPipeline pipeline = parse_pipeline(input);
+                if (strcmp(pipeline.commands[1].command, "grep") == 0) {
+                    execute_command_and_grep(pipeline.commands[0].command, pipeline.commands[0].num_args, pipeline.commands[0].args, pipeline.commands[1].args[0]);
+                } else if (strcmp(pipeline.commands[1].command, "lee")== 0) {
+                    lee(pipeline.commands[0].command, pipeline.commands[0].num_args, pipeline.commands[0].args, pipeline.commands[1].args[0]);
+                } else {
+                    printf("%s", "command doesn't support piping");
+                }
+                break;
+            }
         }
-        free_parsed_input(&parsed_input);
-        break;
-    }
-    case 1: {
-        ParsedPipeline pipeline = parse_pipeline(input);
-        if (strcmp(pipeline.commands[1].command, "grep") == 0) {
-            execute_command_and_grep(pipeline.commands[0].command, pipeline.commands[0].num_args, pipeline.commands[0].args, pipeline.commands[1].args[0]);
-        } else if (strcmp(pipeline.commands[1].command, "lee")== 0) {
-            lee(pipeline.commands[0].command, pipeline.commands[0].num_args, pipeline.commands[0].args, pipeline.commands[1].args[0]);
-        } else {
-            printf("%s", "command doesn't support piping");
-        }
-        break;
-    }
-}
-
-
-        // ParsedPipeline pipeline = parse_pipeline(input);
-
-        // for (int i = 0; i < pipeline.num_commands; i++) {
-        //     printf("Command %d: %s\n", i, pipeline.commands[i].command);
-        //     for (int j = 0; j < pipeline.commands[i].num_args; j++) {
-        //         printf("  Arg %d: %s\n", j, pipeline.commands[i].args[j]);
-        //     }
-        // }
-
-        // ParsedInput parsed_input = parse_input(input);
-
-        // add_to_history(parsed_input.command, parsed_input.num_args, parsed_input.args);
-
-        // if(hasEqualSign(parsed_input.command)){
-        //     saveVariableToFile(parsed_input.command);
-        // } else {
-        //     execute_m(parsed_input.command, parsed_input.num_args, parsed_input.args);
-        // }
-        // free_parsed_input(&parsed_input);
+        free(input);
     }
 
     return 0;

@@ -13,12 +13,11 @@
 10. opp to exe
 11. chmod [*x] util
 12. history 
+13. parse piping
+14. grep and lee(~)
 
-## Plan ##
-* piping(30%)
-	* split commads(90%)
-	* piping func 
-	* piping commands 
+## Plan #
+mb autocomplete
 
 ## Build ##
 ```shell

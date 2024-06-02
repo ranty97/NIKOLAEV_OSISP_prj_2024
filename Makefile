@@ -9,7 +9,7 @@ WF ?=
 WD ?= .
 
 CFLAGS = -W -Wall -Wextra -Werror -pedantic -std=c11 $(if $(call eq,$(MODE),debug),-ggdb)
-LDFLAGS = -lncurses
+LDFLAGS = -lreadline
 CC = gcc $(CFLAGS)
 SOURCES = $(call rwildcard,src,*.c)
 
