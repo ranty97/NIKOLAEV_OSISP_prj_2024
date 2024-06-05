@@ -20,6 +20,7 @@
 #include "history.h"
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <readline/readline.h>
 
 #define MAX_INPUT_LENGTH 100
 #define HISTORY_SIZE 100
@@ -181,6 +182,7 @@ void execute_command_and_grep(char *command, int argc, char **argv, const char *
     }
 }
 
+
 void lee(char *command, int argc, char **argv, const char *output_file) {
     int stdout_pipe[2], stderr_pipe[2];
     char buffer[128];
@@ -268,8 +270,60 @@ void lee(char *command, int argc, char **argv, const char *output_file) {
     }
 }
 
+// Функция для поиска возможных дополнений
+char *command_generator(const char *text, int state) {
+    static int list_index, len;
+    char *name;
+
+    if (!state) {
+        list_index = 0;
+        len = strlen(text);
+    }
+
+    while ((name = builtin_str[list_index++])) {
+        if (strncmp(name, text, len) == 0) {
+            return my_strdup(name);
+        }
+    }
+
+    return NULL;
+}
+
+char *history_generator(const char *text, int state) {
+    static int list_index, len;
+    char *name;
+
+    if (!state) {
+        list_index = 0;
+        len = strlen(text);
+    }
+
+    while (list_index < history_count) {
+        name = history[list_index++];
+        if (strncmp(name, text, len) == 0) {
+            return my_strdup(name);
+        }
+    }
+
+    return NULL;
+}
+
+// Функция для автодополнения
+char **command_completion(const char *text, int start, int end) {
+    (void)start;
+    (void)end;
+
+    char **matches = rl_completion_matches(text, command_generator);
+    if (matches == NULL || matches[0] == NULL) {
+        matches = rl_completion_matches(text, history_generator);
+    }
+    return matches;
+}
+
 int main() {
     char* input;
+
+    rl_attempted_completion_function = command_completion;
 
     while (1) {
         input = get_input();
@@ -300,6 +354,7 @@ int main() {
                 } else {
                     printf("%s", "command doesn't support piping");
                 }
+                add_to_history(pipeline.commands[0].command, pipeline.commands[0].num_args, pipeline.commands[0].args);
                 break;
             }
         }
