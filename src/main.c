@@ -47,7 +47,8 @@ char *builtin_str[] = {
   "clear", 
   "ls",
   "chmod",
-  "history"
+  "history",
+  "help"
 };
 
 void (*builtin_funcs[]) (int argc, char** argv) = {
@@ -64,7 +65,8 @@ void (*builtin_funcs[]) (int argc, char** argv) = {
     &cls,
     &ls,
     &chmod_m,
-    &print_history
+    &print_history,
+    &help
 };
 
 bool hasEqualSign(const char* str) {
