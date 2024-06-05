@@ -15,7 +15,6 @@
 #include "mk.h"
 #include "common.h"
 #include "env.h"
-#include "readline.h"
 #include "chmod_related.h"
 #include "history.h"
 #include <fcntl.h>
