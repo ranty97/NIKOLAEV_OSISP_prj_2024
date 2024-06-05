@@ -15,9 +15,10 @@
 12. history 
 13. parse piping
 14. grep and lee(~)
+15. readline lib autocomplete
 
 ## Plan #
-mb autocomplete
+all done
 
 ## Build ##
 ```shell
